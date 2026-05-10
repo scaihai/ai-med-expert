@@ -1,4 +1,4 @@
-# AI Med Expert
+# MedExpert
 
 **Live App**: https://med-expert.enkwadore.com
 
