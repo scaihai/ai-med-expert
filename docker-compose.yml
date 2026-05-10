@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  med-expert-frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: flask-frontend
+    ports:
+      - "8082:8082"
+    environment:
+      - FLASK_ENV=development
+      - MODEL_SERVER_URL=http://med-expert-model-server:8000
+      - QDRANT_URL=http://qdrant:6333
+    networks:
+      - mlops-net
+    depends_on:
+      - med-expert-model-server
+    restart: unless-stopped
+
+  med-expert-model-server:
+    build:
+      context: ./model-server
+      dockerfile: Dockerfile
+    container_name: model-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - MODEL_PATH=/app/models/fine_tuned/bio_clinical_bert
+      - COLLECTION_NAME=pressure_ulcers
+    networks:
+      - mlops-net
+    restart: unless-stopped
+
+networks:
+  mlops-net:
+    external: true
